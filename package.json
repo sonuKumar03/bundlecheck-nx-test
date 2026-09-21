@@ -29,6 +29,7 @@
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
     "moment": "^2.30.1",
+    "moment-timezone": "^0.6.4",
     "pdfjs-dist": "^4.5.136",
     "rxjs": "^7.8.1",
     "tslib": "^2.6.3",
@@ -44,6 +45,7 @@
     "@nx/workspace": "^22.0.0",
     "@types/d3": "^7.4.0",
     "@types/lodash": "^4.17.0",
+    "@types/moment-timezone": "^0.5.13",
     "nx": "^22.0.0",
     "typescript": "~5.9.3"
   }

@@ -74,6 +74,10 @@ import { AuthService } from './auth.service';
                 <span class="nav-icon">📝</span>
                 <span class="nav-text">Document Editor</span>
               </a>
+              <a routerLink="/scheduler" routerLinkActive="active" class="nav-item">
+                <span class="nav-icon">🕒</span>
+                <span class="nav-text">Timezone Scheduler</span>
+              </a>
             </nav>
 
             <nav class="nav-group">
