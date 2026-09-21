@@ -3,3 +3,6 @@ node_modules/
 .angular/
 tmp/
 dist/
+.bundlecheck/
+bundle-report-*.md
+
