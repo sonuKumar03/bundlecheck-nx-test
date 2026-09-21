@@ -38,6 +38,33 @@
       ],
       "@nx-workspace/timezone-scheduler": [
         "libs/timezone-scheduler/src/index.ts"
+      ],
+      "@nx-workspace/util-formatting": [
+        "libs/util-formatting/src/index.ts"
+      ],
+      "@nx-workspace/util-crypto": [
+        "libs/util-crypto/src/index.ts"
+      ],
+      "@nx-workspace/data-access-auth": [
+        "libs/data-access-auth/src/index.ts"
+      ],
+      "@nx-workspace/data-access-metrics": [
+        "libs/data-access-metrics/src/index.ts"
+      ],
+      "@nx-workspace/ui-data-table": [
+        "libs/ui-data-table/src/index.ts"
+      ],
+      "@nx-workspace/ui-kpi-card": [
+        "libs/ui-kpi-card/src/index.ts"
+      ],
+      "@nx-workspace/feature-billing": [
+        "libs/feature-billing/src/index.ts"
+      ],
+      "@nx-workspace/feature-audit-logs": [
+        "libs/feature-audit-logs/src/index.ts"
+      ],
+      "@nx-workspace/feature-analytics": [
+        "libs/feature-analytics/src/index.ts"
       ]
     },
     "esModuleInterop": true,

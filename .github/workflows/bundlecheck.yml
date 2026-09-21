@@ -56,6 +56,24 @@ jobs:
           build-cmd: 'npm ci && npm run build:admin'
           output: bundle-report-admin.md
 
+      - name: BundleCheck - Analytics Hub
+        uses: sonuKumar03/bundlecheck@master
+        with:
+          project: analytics-hub
+          post-comment: false
+          base-ref: ${{ github.base_ref || '' }}
+          build-cmd: 'npm ci && npm run build:analytics'
+          output: bundle-report-analytics.md
+
+      - name: BundleCheck - Partner Portal
+        uses: sonuKumar03/bundlecheck@master
+        with:
+          project: partner-portal
+          post-comment: false
+          base-ref: ${{ github.base_ref || '' }}
+          build-cmd: 'npm ci && npm run build:partner'
+          output: bundle-report-partner.md
+
       - name: Upload Bundle Reports
         if: always()
         uses: actions/upload-artifact@v4

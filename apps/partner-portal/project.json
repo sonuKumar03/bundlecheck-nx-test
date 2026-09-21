@@ -1,0 +1,55 @@
+{
+  "name": "partner-portal",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "app",
+  "sourceRoot": "apps/partner-portal/src",
+  "targets": {
+    "build": {
+      "executor": "@angular-devkit/build-angular:application",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/partner-portal",
+        "index": "apps/partner-portal/src/index.html",
+        "browser": "apps/partner-portal/src/main.ts",
+        "polyfills": ["zone.js"],
+        "tsConfig": "apps/partner-portal/tsconfig.app.json"
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "1mb",
+              "maximumError": "2mb"
+            }
+          ],
+          "outputHashing": "all",
+          "statsJson": true
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "options": {
+        "buildTarget": "partner-portal:build",
+        "port": 3002
+      },
+      "configurations": {
+        "production": {
+          "buildTarget": "partner-portal:build:production"
+        },
+        "development": {
+          "buildTarget": "partner-portal:build:development"
+        }
+      },
+      "defaultConfiguration": "development"
+    }
+  }
+}

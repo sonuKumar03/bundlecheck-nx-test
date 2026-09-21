@@ -7,9 +7,13 @@
     "serve": "nx serve portal",
     "serve:portal": "nx serve portal",
     "serve:admin": "nx serve admin-dashboard",
-    "build": "nx run-many -t build --projects=portal,admin-dashboard --configuration=production --stats-json",
+    "serve:analytics": "nx serve analytics-hub",
+    "serve:partner": "nx serve partner-portal",
+    "build": "nx run-many -t build --configuration=production --stats-json",
     "build:portal": "nx build portal --stats-json",
     "build:admin": "nx build admin-dashboard --stats-json",
+    "build:analytics": "nx build analytics-hub --stats-json",
+    "build:partner": "nx build partner-portal --stats-json",
     "test": "tsc --noEmit"
   },
   "dependencies": {

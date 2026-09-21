@@ -1,0 +1,7 @@
+{
+  "name": "util-formatting",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/util-formatting/src",
+  "prefix": "lib"
+}
