@@ -42,5 +42,10 @@ export const appRoutes: Route[] = [
     path: 'charts',
     loadComponent: () =>
       import('@nx-workspace/charting').then(m => m.ExecutiveChartComponent)
+  },
+  {
+    path: 'scheduler',
+    loadComponent: () =>
+      import('@nx-workspace/timezone-scheduler').then(m => m.TimezoneSchedulerComponent)
   }
 ];

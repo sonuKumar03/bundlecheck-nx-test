@@ -35,6 +35,9 @@
       ],
       "@nx-workspace/ui": [
         "libs/ui-components/src/index.ts"
+      ],
+      "@nx-workspace/timezone-scheduler": [
+        "libs/timezone-scheduler/src/index.ts"
       ]
     },
     "esModuleInterop": true,
