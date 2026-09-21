@@ -9,7 +9,8 @@
     "serve:admin": "nx serve admin-dashboard",
     "build": "nx run-many -t build --projects=portal,admin-dashboard --configuration=production --stats-json",
     "build:portal": "nx build portal --stats-json",
-    "build:admin": "nx build admin-dashboard --stats-json"
+    "build:admin": "nx build admin-dashboard --stats-json",
+    "test": "tsc --noEmit"
   },
   "dependencies": {
     "@angular/animations": "^21.0.0",
