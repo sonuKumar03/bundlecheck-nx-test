@@ -1,0 +1,7 @@
+{
+  "name": "data-access-metrics",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/data-access-metrics/src",
+  "prefix": "lib"
+}

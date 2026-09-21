@@ -1,0 +1,55 @@
+{
+  "name": "analytics-hub",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "app",
+  "sourceRoot": "apps/analytics-hub/src",
+  "targets": {
+    "build": {
+      "executor": "@angular-devkit/build-angular:application",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/analytics-hub",
+        "index": "apps/analytics-hub/src/index.html",
+        "browser": "apps/analytics-hub/src/main.ts",
+        "polyfills": ["zone.js"],
+        "tsConfig": "apps/analytics-hub/tsconfig.app.json"
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "1mb",
+              "maximumError": "2mb"
+            }
+          ],
+          "outputHashing": "all",
+          "statsJson": true
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "options": {
+        "buildTarget": "analytics-hub:build",
+        "port": 3001
+      },
+      "configurations": {
+        "production": {
+          "buildTarget": "analytics-hub:build:production"
+        },
+        "development": {
+          "buildTarget": "analytics-hub:build:development"
+        }
+      },
+      "defaultConfiguration": "development"
+    }
+  }
+}
