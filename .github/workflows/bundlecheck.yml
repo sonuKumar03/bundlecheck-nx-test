@@ -1,0 +1,61 @@
+name: BundleCheck CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  bundlecheck:
+    name: Check Bundle Size
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build applications with stats.json
+        run: npm run build
+
+      - name: BundleCheck - Portal
+        uses: sonuKumar03/bundlecheck@master
+        with:
+          project: portal
+          post-comment: ${{ github.event_name == 'pull_request' }}
+          base-ref: ${{ github.base_ref || '' }}
+          build-cmd: 'npm ci && npm run build:portal'
+          output: bundle-report-portal.md
+
+      - name: BundleCheck - Admin Dashboard
+        uses: sonuKumar03/bundlecheck@master
+        with:
+          project: admin-dashboard
+          post-comment: false
+          base-ref: ${{ github.base_ref || '' }}
+          build-cmd: 'npm ci && npm run build:admin'
+          output: bundle-report-admin.md
+
+      - name: Upload Bundle Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-reports
+          path: |
+            bundle-report-*.md
+          if-no-files-found: ignore
