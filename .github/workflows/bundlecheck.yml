@@ -5,6 +5,7 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+    types: [opened, synchronize, reopened, labeled]
   workflow_dispatch:
 
 permissions:
@@ -15,6 +16,10 @@ jobs:
   bundlecheck:
     name: Check Bundle Size
     runs-on: ubuntu-latest
+    if: |
+      github.event_name != 'pull_request' ||
+      github.event.action != 'labeled' ||
+      github.event.label.name == 'bundlecheck'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
