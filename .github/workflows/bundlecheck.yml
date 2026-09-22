@@ -97,7 +97,7 @@ jobs:
         run: npx nx build ${{ matrix.app }} --configuration=production --stats-json
 
       - name: Run BundleCheck - ${{ matrix.app }}
-        uses: sonuKumar03/bundlecheck@v0.5.0
+        uses: sonuKumar03/bundlecheck@v0.6.0
         with:
           project: ${{ matrix.app }}
           post-comment: ${{ github.event_name == 'pull_request' }}
