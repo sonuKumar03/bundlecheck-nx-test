@@ -400,10 +400,6 @@ export class AppComponent {
   copyConfig(cfg: any) {
     return cloneDeep(cfg);
   }
-
-  // Trigger bundle size check verification
-  bundleCheckTrigger(): string {
-    return 'Bundle size verification triggered';
-  }
 }
+
 
