@@ -122,3 +122,30 @@ jobs:
           name: bundle-report-${{ matrix.app }}
           path: bundle-report-${{ matrix.app }}.md
           if-no-files-found: ignore
+
+  check-bundle-size:
+    name: Check Bundle Size
+    needs: [detect-affected, bundlecheck]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Aggregate BundleCheck Status
+        run: |
+          DETECT_RESULT="${{ needs.detect-affected.result }}"
+          BUNDLE_RESULT="${{ needs.bundlecheck.result }}"
+
+          echo "detect-affected status: $DETECT_RESULT"
+          echo "bundlecheck status: $BUNDLE_RESULT"
+
+          if [ "$DETECT_RESULT" = "failure" ] || [ "$DETECT_RESULT" = "cancelled" ]; then
+            echo "❌ Detection step failed or was cancelled."
+            exit 1
+          fi
+
+          if [ "$BUNDLE_RESULT" = "failure" ] || [ "$BUNDLE_RESULT" = "cancelled" ]; then
+            echo "❌ Bundle size check failed."
+            exit 1
+          fi
+
+          echo "✅ BundleCheck passed (or cleanly skipped if no apps were affected)."
+          exit 0
