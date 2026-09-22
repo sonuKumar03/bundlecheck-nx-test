@@ -97,15 +97,15 @@ jobs:
         run: npx nx build ${{ matrix.app }} --configuration=production --stats-json
 
       - name: Run BundleCheck - ${{ matrix.app }}
-        uses: sonuKumar03/bundlecheck@v0.6.0
+        uses: sonuKumar03/bundlecheck@v0.6.1
         with:
           project: ${{ matrix.app }}
           post-comment: ${{ github.event_name == 'pull_request' }}
           base-ref: ${{ github.base_ref || '' }}
           build-cmd: 'npx nx build ${{ matrix.app }} --configuration=production --stats-json'
           output: bundle-report-${{ matrix.app }}.md
-          max-initial-delta: '50KB'
-          max-total-delta: '100KB'
+          max-initial-delta: ${{ github.event_name == 'pull_request' && '50KB' || '' }}
+          max-total-delta: ${{ github.event_name == 'pull_request' && '100KB' || '' }}
           max-initial: '3.5MB'
 
       - name: Publish ${{ matrix.app }} Report to Step Summary
