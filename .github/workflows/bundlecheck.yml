@@ -5,21 +5,22 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
-    types: [opened, synchronize, reopened, labeled]
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
-  bundlecheck:
-    name: Check Bundle Size
+  detect-affected:
+    name: Detect Affected Apps
     runs-on: ubuntu-latest
-    if: |
-      github.event_name != 'pull_request' ||
-      github.event.action != 'labeled' ||
-      github.event.label.name == 'bundlecheck'
+    outputs:
+      apps: ${{ steps.affected.outputs.apps }}
+      has_apps: ${{ steps.affected.outputs.has_apps }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -30,62 +31,124 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-
-      - name: Cache node_modules
-        id: node-modules-cache
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+          cache: 'npm'
 
       - name: Install dependencies
-        if: steps.node-modules-cache.outputs.cache-hit != 'true'
         run: npm ci
 
-      - name: Build applications with stats.json
-        run: npm run build
+      - name: Determine affected applications
+        id: affected
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git fetch origin ${{ github.base_ref }} --depth=1
+            BASE=$(git merge-base HEAD "origin/${{ github.base_ref }}")
+            echo "Calculating affected apps against merge-base: $BASE"
+            APPS=$(npx nx show projects --type app --affected --base="$BASE" --head=HEAD --json)
+          else
+            echo "Push to master or manual dispatch: targeting all applications"
+            APPS=$(npx nx show projects --type app --json)
+          fi
 
-      - name: BundleCheck - Portal
-        uses: sonuKumar03/bundlecheck@master
+          echo "Target apps: $APPS"
+          echo "apps=$APPS" >> $GITHUB_OUTPUT
+          if [ "$APPS" != "[]" ] && [ -n "$APPS" ]; then
+            echo "has_apps=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_apps=false" >> $GITHUB_OUTPUT
+          fi
+
+  bundlecheck:
+    name: BundleCheck - ${{ matrix.app }}
+    needs: detect-affected
+    if: needs.detect-affected.outputs.has_apps == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJson(needs.detect-affected.outputs.apps) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          project: portal
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Restore Nx Cache
+        uses: actions/cache@v4
+        with:
+          path: .nx/cache
+          key: ${{ runner.os }}-nx-${{ matrix.app }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-nx-${{ matrix.app }}-
+            ${{ runner.os }}-nx-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build ${{ matrix.app }} with stats.json
+        run: npx nx build ${{ matrix.app }} --configuration=production --stats-json
+
+      - name: Run BundleCheck - ${{ matrix.app }}
+        uses: sonuKumar03/bundlecheck@v0.6.0
+        with:
+          project: ${{ matrix.app }}
           post-comment: ${{ github.event_name == 'pull_request' }}
           base-ref: ${{ github.base_ref || '' }}
-          build-cmd: 'npm ci && npm run build:portal'
-          output: bundle-report-portal.md
+          build-cmd: 'npx nx build ${{ matrix.app }} --configuration=production --stats-json'
+          output: bundle-report-${{ matrix.app }}.md
+          max-initial-delta: '50KB'
+          max-total-delta: '100KB'
+          max-initial: '3.5MB'
 
-      - name: BundleCheck - Admin Dashboard
-        uses: sonuKumar03/bundlecheck@master
-        with:
-          project: admin-dashboard
-          post-comment: false
-          base-ref: ${{ github.base_ref || '' }}
-          build-cmd: 'npm ci && npm run build:admin'
-          output: bundle-report-admin.md
+      - name: Publish ${{ matrix.app }} Report to Step Summary
+        if: always()
+        run: |
+          if [ -f "bundle-report-${{ matrix.app }}.md" ]; then
+            echo "## 📊 Bundle Report: ${{ matrix.app }}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            cat "bundle-report-${{ matrix.app }}.md" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
 
-      - name: BundleCheck - Analytics Hub
-        uses: sonuKumar03/bundlecheck@master
-        with:
-          project: analytics-hub
-          post-comment: false
-          base-ref: ${{ github.base_ref || '' }}
-          build-cmd: 'npm ci && npm run build:analytics'
-          output: bundle-report-analytics.md
-
-      - name: BundleCheck - Partner Portal
-        uses: sonuKumar03/bundlecheck@master
-        with:
-          project: partner-portal
-          post-comment: false
-          base-ref: ${{ github.base_ref || '' }}
-          build-cmd: 'npm ci && npm run build:partner'
-          output: bundle-report-partner.md
-
-      - name: Upload Bundle Reports
+      - name: Upload Bundle Report Artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: bundle-reports
-          path: |
-            bundle-report-*.md
+          name: bundle-report-${{ matrix.app }}
+          path: bundle-report-${{ matrix.app }}.md
           if-no-files-found: ignore
+
+  check-bundle-size:
+    name: Check Bundle Size
+    needs: [detect-affected, bundlecheck]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Aggregate BundleCheck Status
+        run: |
+          DETECT_RESULT="${{ needs.detect-affected.result }}"
+          BUNDLE_RESULT="${{ needs.bundlecheck.result }}"
+
+          echo "detect-affected status: $DETECT_RESULT"
+          echo "bundlecheck status: $BUNDLE_RESULT"
+
+          if [ "$DETECT_RESULT" = "failure" ] || [ "$DETECT_RESULT" = "cancelled" ]; then
+            echo "❌ Detection step failed or was cancelled."
+            exit 1
+          fi
+
+          if [ "$BUNDLE_RESULT" = "failure" ] || [ "$BUNDLE_RESULT" = "cancelled" ]; then
+            echo "❌ Bundle size check failed."
+            exit 1
+          fi
+
+          echo "✅ BundleCheck passed (or cleanly skipped if no apps were affected)."
+          exit 0
