@@ -1,11 +1,11 @@
 name: Nx BundleCheck Affected & Persistent Memory Comparison
 
 on:
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -25,29 +25,28 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: 'npm'
 
-      - name: Cache node_modules
-        id: node-modules-cache
+      - name: Restore Nx Cache
         uses: actions/cache@v4
         with:
-          path: node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+          path: .nx/cache
+          key: ${{ runner.os }}-nx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-nx-
 
       - name: Install dependencies
-        if: steps.node-modules-cache.outputs.cache-hit != 'true'
         run: npm ci
 
       - name: Build affected applications with stats.json
         run: |
-          # Fetch origin master for accurate affected calculations
-          git fetch --no-tags --depth=1 origin ${{ github.base_ref || 'master' }} || true
           BASE_REF="origin/${{ github.base_ref || 'master' }}"
           echo "Comparing changes against base: $BASE_REF"
-          npx nx affected -t build --base="$BASE_REF" --head=HEAD --configuration=production --stats-json || true
+          npx nx affected -t build --base="$BASE_REF" --head=HEAD --configuration=production --stats-json
 
-          # If neither portal nor admin-dashboard was affected (e.g. docs or workflow change), build both to ensure validation runs
-          if [ ! -d "dist/apps/portal" ] && [ ! -d "dist/apps/admin-dashboard" ]; then
-            echo "No primary apps were affected; running fallback build for portal and admin-dashboard..."
+          # If neither portal nor admin-dashboard was affected, build both for comparison purposes
+          if [ ! -f "dist/apps/portal/stats.json" ] && [ ! -f "dist/apps/admin-dashboard/stats.json" ]; then
+            echo "Neither comparison app was affected; running fallback build for portal and admin-dashboard..."
             npm run build:apps
           fi
 
@@ -60,8 +59,8 @@ jobs:
         with:
           project: portal
           artifact-baseline: true
-          upload-artifact-baseline: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/master' }}
-          post-comment: ${{ github.event_name == 'pull_request' }}
+          upload-artifact-baseline: ${{ github.ref == 'refs/heads/master' }}
+          post-comment: false
           output: bundle-report-portal.md
 
       # ----------------------------------------------------------------------
