@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
 permissions:
   contents: read
@@ -44,8 +44,9 @@ jobs:
       - name: Build applications
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            BASE_REF="origin/${{ github.base_ref }}"
-            echo "Building affected applications against $BASE_REF..."
+            git fetch origin ${{ github.base_ref }} --depth=1
+            BASE_REF=$(git merge-base HEAD "origin/${{ github.base_ref }}")
+            echo "Building affected applications against merge-base $BASE_REF..."
             npx nx affected -t build --base="$BASE_REF" --head=HEAD
           else
             echo "Building all applications..."

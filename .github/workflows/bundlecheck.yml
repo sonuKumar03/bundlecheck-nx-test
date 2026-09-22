@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
 permissions:
   contents: read
@@ -40,8 +40,9 @@ jobs:
         id: affected
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            BASE="origin/${{ github.base_ref }}"
-            echo "Calculating affected apps against base: $BASE"
+            git fetch origin ${{ github.base_ref }} --depth=1
+            BASE=$(git merge-base HEAD "origin/${{ github.base_ref }}")
+            echo "Calculating affected apps against merge-base: $BASE"
             APPS=$(npx nx show projects --type app --affected --base="$BASE" --head=HEAD --json)
           else
             echo "Push to master or manual dispatch: targeting all applications"
@@ -84,8 +85,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .nx/cache
-          key: ${{ runner.os }}-nx-${{ github.sha }}
+          key: ${{ runner.os }}-nx-${{ matrix.app }}-${{ github.sha }}
           restore-keys: |
+            ${{ runner.os }}-nx-${{ matrix.app }}-
             ${{ runner.os }}-nx-
 
       - name: Install dependencies
