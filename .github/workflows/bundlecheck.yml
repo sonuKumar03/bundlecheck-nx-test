@@ -98,8 +98,6 @@ jobs:
         uses: sonuKumar03/bundlecheck@v0.5.0
         with:
           project: ${{ matrix.app }}
-          artifact-baseline: true
-          upload-artifact-baseline: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/master' }}
           post-comment: ${{ github.event_name == 'pull_request' }}
           base-ref: ${{ github.base_ref || '' }}
           build-cmd: 'npx nx build ${{ matrix.app }} --configuration=production --stats-json'
