@@ -13,7 +13,6 @@ concurrency:
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
   detect-affected:
@@ -62,6 +61,9 @@ jobs:
     needs: detect-affected
     if: needs.detect-affected.outputs.has_apps == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     strategy:
       fail-fast: false
       matrix:
@@ -93,7 +95,7 @@ jobs:
         run: npx nx build ${{ matrix.app }} --configuration=production --stats-json
 
       - name: Run BundleCheck - ${{ matrix.app }}
-        uses: sonuKumar03/bundlecheck@master
+        uses: sonuKumar03/bundlecheck@v0.5.0
         with:
           project: ${{ matrix.app }}
           artifact-baseline: true

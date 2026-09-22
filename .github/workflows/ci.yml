@@ -46,10 +46,10 @@ jobs:
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             BASE_REF="origin/${{ github.base_ref }}"
             echo "Building affected applications against $BASE_REF..."
-            npx nx affected -t build --base="$BASE_REF" --head=HEAD --configuration=production --stats-json
+            npx nx affected -t build --base="$BASE_REF" --head=HEAD
           else
             echo "Building all applications..."
-            npm run build
+            npx nx run-many -t build
           fi
 
   test:
