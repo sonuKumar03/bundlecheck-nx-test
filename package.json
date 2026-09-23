@@ -38,6 +38,7 @@
     "moment-timezone": "^0.6.4",
     "pdfjs-dist": "^4.5.136",
     "rxjs": "^7.8.1",
+    "three": "^0.186.0",
     "tslib": "^2.6.3",
     "zone.js": "~0.15.0"
   },
@@ -52,6 +53,7 @@
     "@types/d3": "^7.4.0",
     "@types/lodash": "^4.17.0",
     "@types/moment-timezone": "^0.5.13",
+    "@types/three": "^0.186.0",
     "nx": "^22.0.0",
     "typescript": "~5.9.3"
   }

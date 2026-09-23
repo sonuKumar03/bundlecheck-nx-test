@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 // GOTCHA 3: CommonJS lodash import (required for bundleradar fixtures)
 import cloneDeep from 'lodash/cloneDeep';
+import * as THREE from 'three';
 import { ReportDatasetService } from '@nx-workspace/reports';
 import { AuthService } from './auth.service';
 
@@ -98,6 +99,7 @@ import { AuthService } from './auth.service';
                 <span class="tech-tag">PDF.js</span>
                 <span class="tech-tag">Moment</span>
                 <span class="tech-tag">Lodash</span>
+                <span class="tech-tag">Three.js</span>
               </div>
             </div>
           </div>
@@ -396,6 +398,18 @@ export class AppComponent {
   title = 'portal';
   readonly dataset = inject(ReportDatasetService);
   readonly auth = inject(AuthService);
+
+  // Intentional 3D Scene viewport simulation for bundle regression demonstration
+  readonly scene = new THREE.Scene();
+  readonly camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  readonly geometry = new THREE.BoxGeometry(1, 1, 1);
+  readonly material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+  readonly cube = new THREE.Mesh(this.geometry, this.material);
+
+  constructor() {
+    this.scene.add(this.cube);
+    this.camera.position.z = 5;
+  }
 
   copyConfig(cfg: any) {
     return cloneDeep(cfg);
