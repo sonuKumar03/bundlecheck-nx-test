@@ -4,5 +4,6 @@ node_modules/
 tmp/
 dist/
 .bundlecheck/
+.bundleradar/
 bundle-report-*.md
 

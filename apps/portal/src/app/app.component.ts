@@ -5,7 +5,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
-// GOTCHA 3: CommonJS lodash import (required for bundlecheck fixtures)
+// GOTCHA 3: CommonJS lodash import (required for bundleradar fixtures)
 import cloneDeep from 'lodash/cloneDeep';
 import { ReportDatasetService } from '@nx-workspace/reports';
 import { AuthService } from './auth.service';

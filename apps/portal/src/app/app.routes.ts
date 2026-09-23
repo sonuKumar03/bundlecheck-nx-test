@@ -1,6 +1,6 @@
 import { Route } from '@angular/router';
 // GOTCHA 2: Eager Route Import
-// Eagerly imported components to preserve existing bundlecheck test assertions
+// Eagerly imported components to preserve existing bundleradar test assertions
 import { PdfReportComponent } from '@nx-workspace/reports';
 import { ExecutiveChartComponent } from '@nx-workspace/charting';
 import { LoginComponent } from './login.component';

@@ -1,4 +1,4 @@
-name: BundleCheck CI
+name: BundleRadar CI
 
 on:
   push:
@@ -57,8 +57,8 @@ jobs:
             echo "has_apps=false" >> $GITHUB_OUTPUT
           fi
 
-  bundlecheck:
-    name: BundleCheck - ${{ matrix.app }}
+  bundleradar:
+    name: BundleRadar - ${{ matrix.app }}
     needs: detect-affected
     if: needs.detect-affected.outputs.has_apps == 'true'
     runs-on: ubuntu-latest
@@ -96,8 +96,8 @@ jobs:
       - name: Build ${{ matrix.app }} with stats.json
         run: npx nx build ${{ matrix.app }} --configuration=production --stats-json
 
-      - name: Run BundleCheck - ${{ matrix.app }}
-        uses: sonuKumar03/bundlecheck@v0.6.1
+      - name: Run BundleRadar - ${{ matrix.app }}
+        uses: sonuKumar03/bundleradar@v0.6.2
         with:
           project: ${{ matrix.app }}
           post-comment: ${{ github.event_name == 'pull_request' }}
@@ -128,17 +128,17 @@ jobs:
 
   check-bundle-size:
     name: Check Bundle Size
-    needs: [detect-affected, bundlecheck]
+    needs: [detect-affected, bundleradar]
     if: always()
     runs-on: ubuntu-latest
     steps:
-      - name: Aggregate BundleCheck Status
+      - name: Aggregate BundleRadar Status
         run: |
           DETECT_RESULT="${{ needs.detect-affected.result }}"
-          BUNDLE_RESULT="${{ needs.bundlecheck.result }}"
+          BUNDLE_RESULT="${{ needs.bundleradar.result }}"
 
           echo "detect-affected status: $DETECT_RESULT"
-          echo "bundlecheck status: $BUNDLE_RESULT"
+          echo "bundleradar status: $BUNDLE_RESULT"
 
           if [ "$DETECT_RESULT" = "failure" ] || [ "$DETECT_RESULT" = "cancelled" ]; then
             echo "❌ Detection step failed or was cancelled."
@@ -150,5 +150,5 @@ jobs:
             exit 1
           fi
 
-          echo "✅ BundleCheck passed (or cleanly skipped if no apps were affected)."
+          echo "✅ BundleRadar passed (or cleanly skipped if no apps were affected)."
           exit 0

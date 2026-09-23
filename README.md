@@ -1,6 +1,6 @@
 # bundlecheck-nx-test
 
-Testbed Nx monorepo for validating [BundleCheck](https://github.com/sonuKumar03/bundlecheck) GitHub Actions and multi-project analysis.
+Testbed Nx monorepo for validating [BundleRadar](https://github.com/sonuKumar03/bundleradar) GitHub Actions and multi-project analysis.
 
 ## Setup & Build
 
@@ -16,4 +16,4 @@ npm run build
 
 ## CI
 
-Bundle checks run automatically on push and pull requests via [`.github/workflows/bundlecheck.yml`](.github/workflows/bundlecheck.yml).
+Bundle checks run automatically on push and pull requests via [`.github/workflows/bundleradar.yml`](.github/workflows/bundleradar.yml).
