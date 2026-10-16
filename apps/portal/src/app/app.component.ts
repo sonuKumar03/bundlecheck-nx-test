@@ -7,8 +7,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 // GOTCHA 3: CommonJS lodash import (required for bundleradar fixtures)
 import cloneDeep from 'lodash/cloneDeep';
-import * as THREE from 'three';
 import { ReportDatasetService } from '@nx-workspace/reports';
+import { AppSwitcherComponent, ToastContainerComponent } from '@nx-workspace/ui';
 import { AuthService } from './auth.service';
 
 @Component({
@@ -20,7 +20,9 @@ import { AuthService } from './auth.service';
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,
-    MatChipsModule
+    MatChipsModule,
+    AppSwitcherComponent,
+    ToastContainerComponent
   ],
   template: `
     <!-- If not authenticated, render pure router-outlet for Login view -->
@@ -44,6 +46,7 @@ import { AuthService } from './auth.service';
             <span class="status-dot"></span> Serving on port 3000
           </span>
           <span class="dataset-pill">{{ dataset.rows().length }} Active Records</span>
+          <lib-app-switcher currentApp="portal"></lib-app-switcher>
           <div class="user-pill" *ngIf="auth.currentUser() as user">
             <span class="user-avatar">👤</span>
             <span class="user-name">{{ user.name }}</span>
@@ -116,6 +119,8 @@ import { AuthService } from './auth.service';
         <span>OmniReport Enterprise Studio v2.4</span>
         <span>Connected to Nx Workspace (Local Host: 3000)</span>
       </footer>
+
+      <lib-toast-container></lib-toast-container>
     </div>
   `,
   styles: [`
@@ -398,18 +403,6 @@ export class AppComponent {
   title = 'portal';
   readonly dataset = inject(ReportDatasetService);
   readonly auth = inject(AuthService);
-
-  // Intentional 3D Scene viewport simulation for bundle regression demonstration
-  readonly scene = new THREE.Scene();
-  readonly camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  readonly geometry = new THREE.BoxGeometry(1, 1, 1);
-  readonly material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-  readonly cube = new THREE.Mesh(this.geometry, this.material);
-
-  constructor() {
-    this.scene.add(this.cube);
-    this.camera.position.z = 5;
-  }
 
   copyConfig(cfg: any) {
     return cloneDeep(cfg);

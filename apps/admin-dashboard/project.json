@@ -39,7 +39,7 @@
       "executor": "@angular-devkit/build-angular:dev-server",
       "options": {
         "buildTarget": "admin-dashboard:build",
-        "port": 3000
+        "port": 3003
       },
       "configurations": {
         "production": {
