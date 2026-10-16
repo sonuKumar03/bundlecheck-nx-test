@@ -1,23 +1,15 @@
 import { bootstrapApplication } from '@angular/platform-browser';
-import { Component } from '@angular/core';
 import * as ExcelJS from 'exceljs';
 import _ from 'lodash';
+import { appConfig } from './app/app.config';
+import { AdminAppComponent } from './app/app.component';
 
-@Component({
-  standalone: true,
-  selector: 'app-admin-root',
-  template: `<h1>Admin Dashboard</h1>`
-})
-export class AdminRootComponent {
-  exportExcel() {
-    const wb = new ExcelJS.Workbook();
-    return wb;
-  }
-
-  processUsers(users: any[]) {
-    return _.groupBy(users, 'role');
-  }
+// BundleRadar fixture preservation
+export function adminBundleFixtures() {
+  const wb = new ExcelJS.Workbook();
+  const sample = _.groupBy([{ role: 'admin' }], 'role');
+  return { wb, sample };
 }
 
-bootstrapApplication(AdminRootComponent)
+bootstrapApplication(AdminAppComponent, appConfig)
   .catch((err) => console.error(err));

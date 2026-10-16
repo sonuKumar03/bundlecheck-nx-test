@@ -8,6 +8,7 @@ import { MatChipsModule } from '@angular/material/chips';
 // GOTCHA 3: CommonJS lodash import (required for bundleradar fixtures)
 import cloneDeep from 'lodash/cloneDeep';
 import { ReportDatasetService } from '@nx-workspace/reports';
+import { AppSwitcherComponent, ToastContainerComponent } from '@nx-workspace/ui';
 import { AuthService } from './auth.service';
 
 @Component({
@@ -19,7 +20,9 @@ import { AuthService } from './auth.service';
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,
-    MatChipsModule
+    MatChipsModule,
+    AppSwitcherComponent,
+    ToastContainerComponent
   ],
   template: `
     <!-- If not authenticated, render pure router-outlet for Login view -->
@@ -43,6 +46,7 @@ import { AuthService } from './auth.service';
             <span class="status-dot"></span> Serving on port 3000
           </span>
           <span class="dataset-pill">{{ dataset.rows().length }} Active Records</span>
+          <lib-app-switcher currentApp="portal"></lib-app-switcher>
           <div class="user-pill" *ngIf="auth.currentUser() as user">
             <span class="user-avatar">👤</span>
             <span class="user-name">{{ user.name }}</span>
@@ -98,6 +102,7 @@ import { AuthService } from './auth.service';
                 <span class="tech-tag">PDF.js</span>
                 <span class="tech-tag">Moment</span>
                 <span class="tech-tag">Lodash</span>
+                <span class="tech-tag">Three.js</span>
               </div>
             </div>
           </div>
@@ -114,6 +119,8 @@ import { AuthService } from './auth.service';
         <span>OmniReport Enterprise Studio v2.4</span>
         <span>Connected to Nx Workspace (Local Host: 3000)</span>
       </footer>
+
+      <lib-toast-container></lib-toast-container>
     </div>
   `,
   styles: [`
