@@ -100,6 +100,7 @@ jobs:
         uses: sonuKumar03/bundleradar@v2.7.0
         with:
           project: ${{ matrix.app }}
+          stats: dist/apps/${{ matrix.app }}/stats.json
           post-comment: ${{ github.event_name == 'pull_request' }}
           base-ref: ${{ github.base_ref || '' }}
           build-cmd: 'npx nx build ${{ matrix.app }} --configuration=production --stats-json'
