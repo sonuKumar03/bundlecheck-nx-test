@@ -97,7 +97,7 @@ jobs:
         run: npx nx build ${{ matrix.app }} --configuration=production --stats-json
 
       - name: Run BundleRadar - ${{ matrix.app }}
-        uses: sonuKumar03/bundleradar@v0.6.2
+        uses: sonuKumar03/bundleradar@v2.7.0
         with:
           project: ${{ matrix.app }}
           post-comment: ${{ github.event_name == 'pull_request' }}
